@@ -1,21 +1,60 @@
-# Node.js
-# Build a general Node.js project with npm.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.x'
-  displayName: 'Install Node.js'
+stages:
+  # ─────────────────────────────────────────────
+  # STAGE 1: Build Frontend (React + Vite)
+  # ─────────────────────────────────────────────
+  - stage: BuildFrontend
+    displayName: 'Build Frontend'
+    jobs:
+      - job: FrontendBuild
+        displayName: 'Install & Build React App'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '20.x'
+            displayName: 'Use Node.js 20'
 
-- script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
+          - script: |
+              cd frontend
+              npm install
+              npm run build
+            displayName: 'npm install and build (frontend)'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: 'frontend/dist'
+              ArtifactName: 'frontend-dist'
+              publishLocation: 'Container'
+            displayName: 'Publish Frontend Artifacts'
+
+  # ─────────────────────────────────────────────
+  # STAGE 2: Build Backend (Node/Express)
+  # ─────────────────────────────────────────────
+  - stage: BuildBackend
+    displayName: 'Build Backend'
+    dependsOn: BuildFrontend
+    jobs:
+      - job: BackendBuild
+        displayName: 'Install Backend Dependencies'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '20.x'
+            displayName: 'Use Node.js 20'
+
+          - script: |
+              cd server
+              npm install --omit=dev
+            displayName: 'npm install (server)'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: 'server'
+              ArtifactName: 'backend'
+              publishLocation: 'Container'
+            displayName: 'Publish Backend Artifacts'
