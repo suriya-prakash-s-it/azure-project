@@ -14,9 +14,9 @@ stages:
       - job: FrontendBuild
         displayName: 'Install & Build React App'
         steps:
-          - task: NodeTool@0
+          - task: UseNodeV1@1
             inputs:
-              versionSpec: '20.x'
+              version: '20.x'
             displayName: 'Use Node.js 20'
 
           - script: |
@@ -42,9 +42,9 @@ stages:
       - job: BackendBuild
         displayName: 'Install Backend Dependencies'
         steps:
-          - task: NodeTool@0
+          - task: UseNodeV1@1
             inputs:
-              versionSpec: '20.x'
+              version: '20.x'
             displayName: 'Use Node.js 20'
 
           - script: |
