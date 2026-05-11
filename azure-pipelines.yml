@@ -14,12 +14,14 @@ stages:
       - job: FrontendBuild
         displayName: 'Install & Build React App'
         steps:
-          - task: NodeTool@1
+          - task: NodeTool@0
             inputs:
               versionSpec: '20.x'
             displayName: 'Use Node.js 20'
 
           - script: |
+              node --version
+              npm --version
               cd frontend
               npm install
               npm run build
@@ -42,12 +44,13 @@ stages:
       - job: BackendBuild
         displayName: 'Install Backend Dependencies'
         steps:
-          - task: NodeTool@1
+          - task: NodeTool@0
             inputs:
               versionSpec: '20.x'
             displayName: 'Use Node.js 20'
 
           - script: |
+              node --version
               cd server
               npm install --omit=dev
             displayName: 'npm install (server)'
